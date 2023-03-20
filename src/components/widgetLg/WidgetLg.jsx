@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { userRequest } from "../../pages/redux/requestMethods";
+import { userRequest } from "../../redux/requestMethods";
 import "./widgetLg.css";
 import {format,register} from "timeago.js"
 
