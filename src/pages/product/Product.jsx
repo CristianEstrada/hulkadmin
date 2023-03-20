@@ -4,14 +4,54 @@ import Chart from "../../components/chart/Chart";
 import { productData } from "../../dummyData";
 import { Publish } from "@material-ui/icons";
 import { useSelector } from "react-redux";
+import { useEffect, useMemo, useState } from "react";
+import { userRequest } from "../../redux/requestMethods";
 
 export default function Product() {
   const location = useLocation();
   const productId = location.pathname.split("/")[2];
+  const [pStats,setPStats] = useState([])
 
   const product = useSelector((state) =>
     state.product.products.find((product) => product._id === productId)
   );
+    
+  const MONTHS = useMemo(
+    () => [
+      "En",
+      "Feb",
+      "Mar",
+      "Abr",
+      "May",
+      "Jun",
+      "Jul",
+      "Ago",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec"
+    ],[]
+  );
+
+  useEffect(()=>{
+    const getStats = async() => {
+        try {
+            const res = await userRequest.get("orders/income?pid=" + productId);
+            const list = res.data.sort((a,b)=>{
+                return a._id - b._id;
+            })
+            list.map((item) =>
+                setPStats((prev) => [
+                    ...prev,
+                    {name: MONTHS[item._id -1], Sales: item.total},
+                ])
+            );
+        }catch (err) {
+            console.log(err)
+        }
+    };
+    getStats();
+  },[productId, MONTHS]);
 
   return (
     <div className="product">
@@ -23,7 +63,7 @@ export default function Product() {
       </div>
       <div className="productTop">
         <div className="productTopLeft">
-          <Chart data={productData} dataKey="Sales" title="Sales Performance" />
+          <Chart data={pStats} dataKey="Sales" title="Comportamiento de venta" />
         </div>
         <div className="productTopRight">
           <div className="productInfoTop">
@@ -59,7 +99,7 @@ export default function Product() {
             <input type="text" placeholder={product.desc} />
             <label>Precio Producto</label>
             <input type="text" placeholder={product.price} />
-            <label>In Stock</label>
+            <label>En Stock</label>
             <select name="inStock" id="idStock">
               <option value="true">Yes</option>
               <option value="false">No</option>
