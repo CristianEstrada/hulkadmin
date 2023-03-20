@@ -1,10 +1,16 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import "./product.css";
 import Chart from "../../components/chart/Chart"
 import {productData} from "../../dummyData"
 import { Publish } from "@material-ui/icons";
+import { useSelector} from "react-redux"
 
 export default function Product() {
+    const location = useLocation()
+    const productId = location.pathname.split("/")[2];
+
+    const product = useSelector(state=>state.product.products.find(product => product._id === productId))
+
   return (
     <div className="product">
       <div className="productTitleContainer">
